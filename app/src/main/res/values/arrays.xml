@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="Zranges">
+        <item>40</item>
+        <item>50</item>
+        <item>80</item>
+        <item>120</item>
+    </string-array>
+    
+    <string-array name="ZrangeColors">
+        <item>#E7202B</item>
+        <item>#E86F21</item>
+        <item>#E8E721</item>
+        <item>#1BCA21</item>
+    </string-array>
+    
+</resources>

@@ -94,3 +94,6 @@ $RECYCLE.BIN/
 build/
 .gradletasknamecache
 gradle.properties
+
+##Ignore library files
+library/build

@@ -39,7 +39,7 @@ import com.opencsv.CSVWriter;
 
 public class MainActivity extends Activity {
 	
-	Button bRealTime,bMakeCSV,bLoadCSV;
+	Button bRealTime,bMakeCSV,bLoadCSV,bGaugeTest;
 	TextView tvTestText;
 	double count=0;
 
@@ -90,13 +90,13 @@ public class MainActivity extends Activity {
 		series.setTitle("IP");
 		series2.setTitle("Zaki");
 		series.setOnDataPointTapListener(new OnDataPointTapListener() {
-			
-			@Override
-			public void onTap(Series arg0, DataPointInterface arg1) {
-				Toast.makeText(getApplicationContext(), "Time: "+arg1.getX()+" Hrs Prod: "+arg1.getY()+"%", Toast.LENGTH_SHORT).show();
-				
-			}
-		});
+
+            @Override
+            public void onTap(Series arg0, DataPointInterface arg1) {
+                Toast.makeText(getApplicationContext(), "Time: " + arg1.getX() + " Hrs Prod: " + arg1.getY() + "%", Toast.LENGTH_SHORT).show();
+
+            }
+        });
 		series2.setOnDataPointTapListener(new OnDataPointTapListener() {
 			
 			@Override
@@ -130,6 +130,16 @@ public class MainActivity extends Activity {
 				
 			}
 		});
+        bGaugeTest = (Button) findViewById(R.id.bGaugeTest);
+        bGaugeTest.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent;
+                myIntent = new Intent(getApplicationContext(), GaugeTestActivity.class);
+                startActivity(myIntent);
+
+            }
+        });
 //		bMakeCSV = (Button) findViewById(R.id.bMakeCSV);
 //		bMakeCSV.setOnClickListener(new OnClickListener() {
 //			

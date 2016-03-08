@@ -43,6 +43,11 @@
             android:label="FileBrowserActivity"
             android:screenOrientation="landscape" >
         </activity>
+        <activity
+            android:name=".GaugeTestActivity"
+            android:label="GaugeTestActivity"
+            android:screenOrientation="landscape" >
+        </activity>
     </application>
 
 </manifest>
