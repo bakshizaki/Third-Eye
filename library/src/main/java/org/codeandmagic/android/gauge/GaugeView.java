@@ -759,7 +759,7 @@ public class GaugeView extends View {
 	}
 
 	private float getValueForTick(final int tick) {
-        Log.v("GaugeView","Tick: "+tick);
+//        Log.v("GaugeView","Tick: "+tick);
         DecimalFormat df = new DecimalFormat("#.##");
         float f = mScaleStartValue + tick * (mDivisionValue / mSubdivisions);
         return Float.parseFloat(df.format(f));
