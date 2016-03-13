@@ -65,7 +65,7 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
     ArrayList mList = new ArrayList();
     ArrayList paired_addresses = new ArrayList();
     ArrayList discovered_addresses = new ArrayList();
-    final Handler handler = new Handler();
+    Handler handler = new Handler();
     private BluetoothSocket btSocket = null;
     private StringBuilder sb = new StringBuilder();
     private ConnectedThread mConnectedThread;
@@ -97,6 +97,9 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
     CharSequence[] parameters;
     ArrayList<CharSequence> selectedParameter = new ArrayList<CharSequence>();
     BTData btData;
+    Long prevBTTime;
+    private int btCheckIntreval = 5000;
+    private Handler btCheckHandler = new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,12 +135,20 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
 		setLegendsAndTap();
     }
 
+    void ResetVariables() {
+        paired_addresses = new ArrayList();
+        handler = new Handler();
+        readBufferPosition = 0;
+        readBuffer = new byte[1024];;
+
+    }
+
     private void initParameters() {
         parameterList.clear();
         parameterList.add(new Parameter("Pressure 1", Color.BLUE, "bar", true));
         parameterList.add(new Parameter("Pressure 2", Color.GREEN, "bar", true));
-        parameterList.add(new Parameter("Pressure 3",Color.RED,"bar",false));
-        parameterList.add(new Parameter("Temperature",Color.BLACK,"degC",false));
+        parameterList.add(new Parameter("Pressure 3", Color.RED, "bar", false));
+        parameterList.add(new Parameter("Temperature", Color.BLACK, "degC", false));
     }
 
 
@@ -236,8 +247,10 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
             Log.d(TAG, "....Connection ok...");
         } catch (IOException e) {
             try {
-                btSocket.close();
-                Log.d(TAG, "Closing btSocket");
+                if(btSocket!=null) {
+                    btSocket.close();
+                    Log.d(TAG, "Closing btSocket");
+                }
                 return;
             } catch (IOException e2) {
                 Toast.makeText(getApplicationContext(), "Unable to close socket during socket failure",
@@ -255,10 +268,14 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
             ((MyApplication) this.getApplication()).setBluetoothSocket(btSocket);
             ((MyApplication) this.getApplication()).setBTConnected(true);
             checkBTandSetStatus();
+
         }
+        stopThread = false;
+
+
         mConnectedThread = new ConnectedThread(btSocket);
         mConnectedThread.start();
-
+        mConnectedThread.write("$");
     }
 
     private class ConnectedThread extends Thread {
@@ -306,12 +323,15 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
                                 handler.post(new Runnable() {
                                     public void run() {
                                         if (data != null) {
+                                            Log.d(TAG,"Data Received");
                                             if (isPaused == false) {
                                                 xCount++;
                                                 btData = new BTData(data);
                                                 if (blFirstTime) {
                                                     firstTime = btData.getTime();
                                                     blFirstTime = false;
+                                                    prevBTTime = System.currentTimeMillis()/1000;
+                                                    StartBTChecker();
                                                 }
                                                 currentTime = btData.getTime();
                                                 for(int i=0;i<parameterList.size();i++) {
@@ -340,6 +360,8 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
                                             } else {
                                                 pausedBTData.add(new BTData(data));
                                             }
+                                            new WriteAsyncTask().execute();
+                                            prevBTTime = System.currentTimeMillis()/1000;
                                         }
 
                                     }
@@ -415,8 +437,51 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
                 mConnectedThread.start();
 
             stopThread = false;
+            mConnectedThread.write("$");
         }
         checkBTandSetStatus();
+    }
+
+    Runnable btChecker = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "Inside BT Checker");
+            btCheckHandler.postDelayed(btChecker, btCheckIntreval);
+            if(System.currentTimeMillis()/1000 - prevBTTime > 3)
+            {
+                blFirstTime = true;
+                stopThread = true;
+                if (mConnectedThread != null) {
+                    mConnectedThread.interrupt();
+                    Log.d(TAG, "stopped thread");
+                }
+                mConnectedThread = null;
+                try {
+                    if(btSocket!=null)
+                    btSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                btSocket = null;
+                DeleteFromMyApplication();
+                checkBTandSetStatus();
+                ResetVariables();
+                StopBTChecker();
+            }
+        }
+    };
+
+    void DeleteFromMyApplication() {
+        ((MyApplication) this.getApplication()).setBTConnected(false);
+        ((MyApplication) this.getApplication()).setBluetoothSocket(null);
+    }
+
+    void StartBTChecker() {
+        btChecker.run();
+    }
+
+    void StopBTChecker() {
+        btCheckHandler.removeCallbacks(btChecker);
     }
 
     void checkBTandSetStatus() {
@@ -455,6 +520,7 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
 
                 singlechoice = new SingleListDialog("Paired Devices", (String[]) list.toArray(new String[list.size()]));
                 singlechoice.show(getFragmentManager(), "Iamhopeless");
+
                 break;
             case R.id.bPause:
                 isPaused = !isPaused;
@@ -546,6 +612,18 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
         }
         new ConnectAsyncTask().execute();
         is_device_selected = true;
+        graph.removeAllSeries();
+
+        for(int i=0;i<parameterList.size();i++) {
+            if(selectedParameter.contains(parameterList.get(i).getName())) {
+                parameterList.get(i).setVisible(true);
+                parameterList.get(i).series = new LineGraphSeries<DataPoint>();
+                parameterList.get(i).series.setColor(parameterList.get(i).getColour());
+                graph.addSeries(parameterList.get(i).series);
+            }
+        }
+
+        setLegendsAndTap();
     }
 
     class ConnectAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -568,6 +646,24 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
             return null;
         }
 
+    }
+
+    class WriteAsyncTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            mConnectedThread.write("$");
+            return null;
+        }
     }
 
     @Override
