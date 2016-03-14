@@ -15,6 +15,12 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.helloworld2.SingleListDialog.GetResultDialogListner;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer.LegendAlign;
@@ -100,12 +106,16 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
     Long prevBTTime;
     private int btCheckIntreval = 5000;
     private Handler btCheckHandler = new Handler();
+    RequestQueue queue;
+    String url ="http://128.199.166.20/ge.php?";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.realtimeactivity);
         initParameters();
         init_elements();
+        queue = Volley.newRequestQueue(this);
         BA = BluetoothAdapter.getDefaultAdapter();
         if (!BA.isEnabled()) {
             Intent turnon = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -324,41 +334,93 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
                                     public void run() {
                                         if (data != null) {
                                             Log.d(TAG,"Data Received");
-                                            if (isPaused == false) {
-                                                xCount++;
-                                                btData = new BTData(data);
-                                                if (blFirstTime) {
-                                                    firstTime = btData.getTime();
-                                                    blFirstTime = false;
-                                                    prevBTTime = System.currentTimeMillis()/1000;
-                                                    StartBTChecker();
-                                                }
-                                                currentTime = btData.getTime();
-                                                for(int i=0;i<parameterList.size();i++) {
-                                                    if(parameterList.get(i).isVisible())
-                                                        parameterList.get(i).series.appendData(new DataPoint(btData.getTime()-firstTime,btData.getParameter(i+1)),true,120);
-                                                }
+                                            int commas = 0;
+                                            for (int i = 0; i < data.length(); i++) {
+                                                if(data.charAt(i)== ',')
+                                                    commas++;
+                                            }
 
-                                                if (isRecording) {
-                                                    openCSVFile();
-                                                    writeCSVFile(btData);
-                                                }
-
-                                                if (isScaled) {
-                                                    graph.getViewport().setXAxisBoundsManual(true);
-                                                    if (xCount < 50) {
-                                                        graph.getViewport().setMinX(1);
-                                                        graph.getViewport().setMaxX(50);
-                                                    } else {
-                                                        graph.getViewport().setMinX(xCount - 48);
-                                                        graph.getViewport().setMaxX(xCount + 2);
-
+                                            if (commas == 10) {
+                                                if (isPaused == false) {
+                                                    xCount++;
+                                                    btData = new BTData(data);
+                                                    if (blFirstTime) {
+                                                        firstTime = btData.getTime();
+                                                        blFirstTime = false;
+                                                        prevBTTime = System.currentTimeMillis()/1000;
+                                                        StartBTChecker();
                                                     }
-                                                    isScaled = false;
-                                                }
+                                                    String urlParameters = url;
+                                                    urlParameters += "p1=";
+                                                    urlParameters += String.valueOf((btData.getParameter(1)));
+                                                    urlParameters += "&";
+                                                    urlParameters += "p2=";
+                                                    urlParameters += String.valueOf((btData.getParameter(2)));
+                                                    urlParameters += "&";
+                                                    urlParameters += "p3=";
+                                                    urlParameters += String.valueOf((btData.getParameter(3)));
+                                                    urlParameters += "&";
+                                                    urlParameters += "t=";
+                                                    urlParameters += String.valueOf((btData.getParameter(4)));
+                                                    urlParameters += "&";
+                                                    urlParameters += "ta=";
+                                                    urlParameters += String.valueOf((btData.getParameter(5)));
+                                                    urlParameters += "&";
+                                                    urlParameters += "h=";
+                                                    urlParameters += String.valueOf((btData.getParameter(6)));
+                                                    urlParameters += "&";
+                                                    urlParameters += "o1=";
+                                                    urlParameters += String.valueOf((btData.getParameter(7)));
+                                                    urlParameters += "&";
+                                                    urlParameters += "o2=";
+                                                    urlParameters += String.valueOf((btData.getParameter(8)));
+                                                    urlParameters += "&";
+                                                    urlParameters += "o3=";
+                                                    urlParameters += String.valueOf((btData.getParameter(9)));
+                                                    urlParameters += "&";
+                                                    urlParameters += "o4=";
+                                                    urlParameters += String.valueOf((btData.getParameter(10)));
+                                                    StringRequest stringRequest = new StringRequest(Request.Method.GET, urlParameters, new Response.Listener<String>() {
+                                                        @Override
+                                                        public void onResponse(String response) {
+                                                            Log.d("RealTimeActivity","Response is: "+ response);
+                                                        }
+                                                    }, new Response.ErrorListener() {
+                                                        @Override
+                                                        public void onErrorResponse(VolleyError error) {
+                                                            Log.d("RealTimeActivity","Request Failed");
+                                                        }
+                                                    });
+                                                    queue.add(stringRequest);
 
-                                            } else {
-                                                pausedBTData.add(new BTData(data));
+                                                        currentTime = btData.getTime();
+                                                    for(int i=0;i<parameterList.size();i++) {
+
+                                                        if(parameterList.get(i).isVisible())
+                                                            parameterList.get(i).series.appendData(new DataPoint(btData.getTime()-firstTime,btData.getParameter(i+1)),true,120);
+                                                    }
+
+                                                    if (isRecording) {
+                                                        openCSVFile();
+                                                        writeCSVFile(btData);
+                                                    }
+
+                                                    if (isScaled) {
+                                                        graph.getViewport().setXAxisBoundsManual(true);
+                                                        if (xCount < 50) {
+                                                            graph.getViewport().setMinX(1);
+                                                            graph.getViewport().setMaxX(50);
+                                                        } else {
+                                                            graph.getViewport().setMinX(xCount - 48);
+                                                            graph.getViewport().setMaxX(xCount + 2);
+
+                                                        }
+                                                        isScaled = false;
+                                                    }
+
+                                                } else {
+                                                    pausedBTData.add(new BTData(data));
+                                                }
                                             }
                                             new WriteAsyncTask().execute();
                                             prevBTTime = System.currentTimeMillis()/1000;
@@ -422,6 +484,7 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
             Log.d(TAG, "stopped thread");
         }
         mConnectedThread = null;
+        StopBTChecker();
         finish();
         super.onDestroy();
 

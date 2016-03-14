@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -50,7 +51,7 @@ public class GaugeTestActivity extends Activity {
     private String address;
     private boolean stopThread = false;
     BTData btData;
-
+    boolean blFirstTime = true;
     ArrayList<Parameter> parameterList = new ArrayList<>();
     ArrayList<GaugeView> gaugeList = new ArrayList<>();
     ArrayList<TextView> textViewArrayList = new ArrayList<>();
@@ -60,6 +61,9 @@ public class GaugeTestActivity extends Activity {
     private ImageView mOpto1,mOpto2,mOpto3,mOpto4;
     private TextView tvPressure1,tvPressure2,tvPressure3,tvTemperature,tvTa,tvHumidity,tvOpto1,tvOpto2,tvOpto3,tvOpto4;
     private final Random RAND = new Random();
+    private int btCheckIntreval = 5000;
+    private Handler btCheckHandler = new Handler();
+    Long prevBTTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,12 +179,28 @@ public class GaugeTestActivity extends Activity {
                                 handler.post(new Runnable() {
                                     public void run() {
                                         if (data != null) {
-                                            btData = new BTData(data);
-                                            for (int i = 0; i < number_of_gauges; i++) {
-                                                gaugeList.get(i).setTargetValue((float)btData.getParameter(i+1));
-                                                textViewArrayList.get(i).setText(parameterList.get(i).getName()+": "+btData.getParameter(i+1)+" "+parameterList.get(i).getUnit());
-
+                                            int commas = 0;
+                                            for (int i = 0; i < data.length(); i++) {
+                                                  if(data.charAt(i)== ',')
+                                                      commas++;
                                             }
+
+                                            if (commas == 10) {
+                                                btData = new BTData(data);
+                                                if (blFirstTime) {
+                                                    blFirstTime = false;
+                                                    prevBTTime = System.currentTimeMillis()/1000;
+                                                    StartBTChecker();
+                                                }
+                                                for (int i = 0; i < number_of_gauges; i++) {
+                                                    gaugeList.get(i).setTargetValue((float)btData.getParameter(i+1));
+                                                    textViewArrayList.get(i).setText(parameterList.get(i).getName()+": "+btData.getParameter(i+1)+" "+parameterList.get(i).getUnit());
+
+                                                }
+                                            }
+
+                                            new WriteAsyncTask().execute();
+                                            prevBTTime = System.currentTimeMillis()/1000;
 
 
 
@@ -235,6 +255,67 @@ public class GaugeTestActivity extends Activity {
         return device.createRfcommSocketToServiceRecord(MY_UUID);
     }
 
+    Runnable btChecker = new Runnable() {
+        @Override
+        public void run() {
+            Log.d("GaugeTestActivity", "Inside BT Checker");
+            btCheckHandler.postDelayed(btChecker, btCheckIntreval);
+            if(System.currentTimeMillis()/1000 - prevBTTime > 3)
+            {
+                blFirstTime = true;
+                stopThread = true;
+                if (mConnectedThread != null) {
+                    mConnectedThread.interrupt();
+                    Log.d(TAG, "stopped thread");
+                }
+                mConnectedThread = null;
+                try {
+                    if(btSocket!=null)
+                        btSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                btSocket = null;
+                DeleteFromMyApplication();
+                checkBTandSetStatus();
+//                ResetVariables();
+                StopBTChecker();
+            }
+        }
+    };
+
+    void DeleteFromMyApplication() {
+        ((MyApplication) this.getApplication()).setBTConnected(false);
+        ((MyApplication) this.getApplication()).setBluetoothSocket(null);
+    }
+
+    void StartBTChecker() {
+        btChecker.run();
+    }
+
+    void StopBTChecker() {
+        btCheckHandler.removeCallbacks(btChecker);
+    }
+
+    class WriteAsyncTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            mConnectedThread.write("$");
+            return null;
+        }
+    }
+
+
     @Override
     protected void onDestroy() {
 
@@ -244,6 +325,7 @@ public class GaugeTestActivity extends Activity {
             Log.d(TAG, "stopped thread");
         }
         mConnectedThread = null;
+        StopBTChecker();
         finish();
         super.onDestroy();
 
@@ -259,6 +341,7 @@ public class GaugeTestActivity extends Activity {
                 mConnectedThread.start();
 
             stopThread = false;
+            mConnectedThread.write("$");
         }
         checkBTandSetStatus();
     }
