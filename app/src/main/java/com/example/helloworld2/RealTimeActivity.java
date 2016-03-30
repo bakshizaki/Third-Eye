@@ -108,7 +108,7 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
     private Handler btCheckHandler = new Handler();
     RequestQueue queue;
     String url ="http://128.199.166.20/ge.php?";
-
+    String[] parametersTitle = {"Time","Pressure 1","Pressure 2","Pressure 3","Temperature","Ambient Temp","Humidity","Opto1","Opto2","Opto3","Opto4"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -606,11 +606,14 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
                 isScaled = !isScaled;
                 break;
             case R.id.bStartRecordinng:
+                Log.d("Recording","Recording Started");
+                Toast.makeText(getApplicationContext(),"Recording Started",Toast.LENGTH_SHORT);
                 isRecording = true;
-                SimpleDateFormat s = new SimpleDateFormat("ddMMyyyyhhmmss");
+                SimpleDateFormat s = new SimpleDateFormat("yyyyMMddhhmmss");
                 String format = s.format(new Date());
                 currFile = format;
-
+                openCSVFile();
+                writeCSVTitle();
                 break;
             case R.id.bStopRecordinng:
                 isRecording = false;
@@ -661,6 +664,23 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
         }
         Toast.makeText(getApplicationContext(), "Inside write function", Toast.LENGTH_SHORT);
 
+    }
+
+    public void writeCSVTitle() {
+        try {
+            writer = new CSVWriter(new FileWriter(csvfile, true));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            Log.d("Zaki Baki", "It did not work");
+            e.printStackTrace();
+        }
+        writer.writeNext(parametersTitle);
+        try {
+            writer.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override

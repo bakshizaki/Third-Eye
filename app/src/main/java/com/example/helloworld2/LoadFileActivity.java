@@ -186,7 +186,12 @@ public class LoadFileActivity extends Activity implements OnClickListener,OnData
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				String[] row;
+                try {
+                    csvReader.readNext();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String[] row;
 				try {
 					while ((row = csvReader.readNext()) != null) {
 						StringBuilder sb = new StringBuilder("");
