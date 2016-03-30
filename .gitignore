@@ -97,3 +97,5 @@ gradle.properties
 
 ##Ignore library files
 library/build
+
+captures/

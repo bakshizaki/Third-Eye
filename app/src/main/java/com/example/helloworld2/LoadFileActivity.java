@@ -77,6 +77,12 @@ public class LoadFileActivity extends Activity implements OnClickListener,OnData
 		parameterList.add(new Parameter("Pressure 2", Color.GREEN, "bar", true));
 		parameterList.add(new Parameter("Pressure 3",Color.RED,"bar",false));
 		parameterList.add(new Parameter("Temperature",Color.BLACK,"degC",false));
+		parameterList.add(new Parameter("Ambient T", Color.CYAN, "degC", false));
+		parameterList.add(new Parameter("Humidity", Color.GRAY, "%", false));
+		parameterList.add(new Parameter("Opto1", Color.MAGENTA, " ", false));
+		parameterList.add(new Parameter("Opto2", Color.YELLOW, " ", false));
+		parameterList.add(new Parameter("Opto3", Color.DKGRAY, " ", false));
+		parameterList.add(new Parameter("Opto4", Color.WHITE, " ", false));
 	}
 
 	private void clearSeries() {

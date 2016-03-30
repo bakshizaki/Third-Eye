@@ -108,7 +108,7 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
     private Handler btCheckHandler = new Handler();
     RequestQueue queue;
     String url ="http://128.199.166.20/ge.php?";
-    String[] parametersTitle = {"Time","Pressure 1","Pressure 2","Pressure 3","Temperature","Ambient Temp","Humidity","Opto1","Opto2","Opto3","Opto4"};
+    String[] parametersTitle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,6 +159,12 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
         parameterList.add(new Parameter("Pressure 2", Color.GREEN, "bar", true));
         parameterList.add(new Parameter("Pressure 3", Color.RED, "bar", false));
         parameterList.add(new Parameter("Temperature", Color.BLACK, "degC", false));
+        parameterList.add(new Parameter("Ambient T", Color.CYAN, "degC", false));
+        parameterList.add(new Parameter("Humidity", Color.GRAY, "%", false));
+        parameterList.add(new Parameter("Opto1", Color.MAGENTA, " ", false));
+        parameterList.add(new Parameter("Opto2", Color.YELLOW, " ", false));
+        parameterList.add(new Parameter("Opto3", Color.DKGRAY, " ", false));
+        parameterList.add(new Parameter("Opto4", Color.WHITE, " ", false));
     }
 
 
@@ -673,6 +679,12 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
             // TODO Auto-generated catch block
             Log.d("Zaki Baki", "It did not work");
             e.printStackTrace();
+        }
+        parametersTitle = new String[parameterList.size()+1];
+        parametersTitle[0] = "Time";
+        for (int i = 0; i < parameterList.size(); i++) {
+            parametersTitle[i+1] = parameterList.get(i).getName();
+
         }
         writer.writeNext(parametersTitle);
         try {
