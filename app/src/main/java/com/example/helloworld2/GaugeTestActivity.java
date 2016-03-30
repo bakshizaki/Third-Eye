@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -55,6 +56,7 @@ public class GaugeTestActivity extends Activity {
     ArrayList<Parameter> parameterList = new ArrayList<>();
     ArrayList<GaugeView> gaugeList = new ArrayList<>();
     ArrayList<TextView> textViewArrayList = new ArrayList<>();
+    ArrayList<ImageView> imageViewArrayList = new ArrayList<>();
     int number_of_gauges;
 
     private GaugeView mGaugeP1,mGaugeP2,mGaugeP3,mGaugeT,mGaugeTa,mGaugeHumidity;
@@ -87,8 +89,12 @@ public class GaugeTestActivity extends Activity {
         parameterList.add(new Parameter("Pressure 2", Color.GREEN, "bar", false));
         parameterList.add(new Parameter("Pressure 3", Color.RED, "bar", false));
         parameterList.add(new Parameter("Temperature",Color.BLACK,"degC",false));
-        parameterList.add(new Parameter("Ambient T",Color.BLACK,"degC",false));
-        parameterList.add(new Parameter("Humidity",Color.BLACK,"%",false));
+        parameterList.add(new Parameter("Ambient T", Color.CYAN, "degC", false));
+        parameterList.add(new Parameter("Humidity", Color.GRAY, "%", false));
+        parameterList.add(new Parameter("Opto1", Color.MAGENTA, " ", false));
+        parameterList.add(new Parameter("Opto2", Color.YELLOW, " ", false));
+        parameterList.add(new Parameter("Opto3", Color.DKGRAY, " ", false));
+        parameterList.add(new Parameter("Opto4", Color.WHITE, " ", false));
     }
     private void init_elements() {
         tvBTStatus = (TextView) findViewById(R.id.tvBTStatus2);
@@ -113,6 +119,10 @@ public class GaugeTestActivity extends Activity {
         mOpto2 = (ImageView) findViewById(R.id.ivOpto2);
         mOpto3 = (ImageView) findViewById(R.id.ivOpto3);
         mOpto4 = (ImageView) findViewById(R.id.ivOpto4);
+        imageViewArrayList.add(mOpto1);
+        imageViewArrayList.add(mOpto2);
+        imageViewArrayList.add(mOpto3);
+        imageViewArrayList.add(mOpto4);
         tvPressure1 = (TextView) findViewById(R.id.tvPressure1);
         tvPressure2 = (TextView) findViewById(R.id.tvPressure2);
         tvPressure3 = (TextView) findViewById(R.id.tvPressure3);
@@ -195,6 +205,13 @@ public class GaugeTestActivity extends Activity {
                                                 for (int i = 0; i < number_of_gauges; i++) {
                                                     gaugeList.get(i).setTargetValue((float)btData.getParameter(i+1));
                                                     textViewArrayList.get(i).setText(parameterList.get(i).getName()+": "+btData.getParameter(i+1)+" "+parameterList.get(i).getUnit());
+
+                                                }
+                                                for (int i = number_of_gauges,j=0; i < number_of_gauges+imageViewArrayList.size(); i++,j++) {
+                                                    if(btData.getParameter(i+1)==1.0)
+                                                        imageViewArrayList.get(j).setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.statuson));
+                                                    else
+                                                        imageViewArrayList.get(j).setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.statusoff));
 
                                                 }
                                             }
