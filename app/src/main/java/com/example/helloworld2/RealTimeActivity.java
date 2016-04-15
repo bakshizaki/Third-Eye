@@ -110,6 +110,7 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
     RequestQueue queue;
     String url ="http://128.199.166.20/ge.php?";
     String[] parametersTitle;
+    TextView tvRecordingStatus;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -190,6 +191,8 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
         bStopRecording.setOnClickListener(this);
         bSelectPara = (Button) findViewById(R.id.bSelectPara);
         bSelectPara.setOnClickListener(this);
+        tvRecordingStatus = (TextView) findViewById(R.id.tvRecordingStatus);
+        tvRecordingStatus.setBackgroundColor(Color.RED);
     }
 
     void setLegendsAndTap() {
@@ -206,6 +209,7 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
 
         for(int i=0;i<parameterList.size();i++) {
             if(selectedParameter.contains(parameterList.get(i).getName())) {
+                if()
                 parameterList.get(i).setVisible(true);
                 parameterList.get(i).series.appendData(new DataPoint(btData.getTime()-firstTime,btData.getParameter(i+1)),true,120);
                 graph.addSeries(parameterList.get(i).series);
@@ -518,7 +522,7 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
         public void run() {
             Log.d(TAG, "Inside BT Checker");
             btCheckHandler.postDelayed(btChecker, btCheckIntreval);
-            if(System.currentTimeMillis()/1000 - prevBTTime > 3)
+            if(System.currentTimeMillis()/1000 - prevBTTime > 5)
             {
                 blFirstTime = true;
                 stopThread = true;
@@ -614,6 +618,8 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
                 isScaled = !isScaled;
                 break;
             case R.id.bStartRecordinng:
+                tvRecordingStatus.setText("Recording");
+                tvRecordingStatus.setBackgroundColor(Color.GREEN);
                 Log.d("Recording","Recording Started");
                 Toast.makeText(getApplicationContext(),"Recording Started",Toast.LENGTH_SHORT);
                 isRecording = true;
@@ -624,6 +630,8 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
                 writeCSVTitle();
                 break;
             case R.id.bStopRecordinng:
+                tvRecordingStatus.setText("Not Recording");
+                tvRecordingStatus.setBackgroundColor(Color.RED);
                 isRecording = false;
                 break;
             case R.id.bSelectPara:

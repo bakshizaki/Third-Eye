@@ -277,7 +277,7 @@ public class GaugeTestActivity extends Activity {
         public void run() {
             Log.d("GaugeTestActivity", "Inside BT Checker");
             btCheckHandler.postDelayed(btChecker, btCheckIntreval);
-            if(System.currentTimeMillis()/1000 - prevBTTime > 3)
+            if(System.currentTimeMillis()/1000 - prevBTTime > 5)
             {
                 blFirstTime = true;
                 stopThread = true;

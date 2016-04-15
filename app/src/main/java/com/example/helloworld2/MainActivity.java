@@ -81,7 +81,7 @@ public class MainActivity extends Activity {
 		graph.getViewport().setMinY(0.0);
 		graph.getViewport().setMaxY(100);
 //		graph.getViewport().setBackgroundColor(Color.WHITE);
-		graph.setTitle("IP vs Zaki");
+		graph.setTitle("Pushkar vs Zaki");
 		graph.getGridLabelRenderer().setHorizontalAxisTitle("Time");
 		graph.getGridLabelRenderer().setVerticalAxisTitle("Productivity");
 		graph.getGridLabelRenderer().setHorizontalLabelsColor(Color.RED);
