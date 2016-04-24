@@ -4,5 +4,10 @@
     <string name="app_name">HelloWorld2</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-
+    <string name="graphical_text"><b>Graphical View</b></string>
+    <string name="graphical_def">Connect Bluetooth Device and Monitor parameters in Graphical View</string>
+    <string name="gauge_text"><b>Gauge View</b></string>
+    <string name="gauge_def">Monitor Parameters in Gauge View</string>
+    <string name="loadcsv_text"><b>Load CSV</b></string>
+    <string name="loadcsv_def">Load recorded CSV Files</string>
 </resources>

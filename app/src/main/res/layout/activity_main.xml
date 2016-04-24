@@ -19,13 +19,13 @@
         <Button android:id="@+id/bRealTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="RealTime"/>
+            android:text="Graphical View"/>
 
 
         <Button android:id="@+id/bGaugeTest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Gauge Test"/>
+            android:text="Gauge View"/>
         <!--
         <Button android:id="@+id/bMakeCSV"
                 android:layout_width="wrap_content"
@@ -41,9 +41,49 @@
             android:layout_height="wrap_content"
             android:text="Load CSV"/>
     </LinearLayout>
+    <!--
     <com.jjoe64.graphview.GraphView
         android:id="@+id/graph"
         android:layout_width="match_parent"
         android:layout_height="250dip" />
+-->
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/graphical_text"
+        android:textSize="50dp"
+        android:layout_marginTop="20dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/graphical_def"
+        android:textSize="25dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/gauge_text"
+        android:textSize="50dp"
+        android:layout_marginTop="20dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/gauge_def"
+        android:textSize="25dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/loadcsv_text"
+        android:textSize="50dp"
+        android:layout_marginTop="20dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/loadcsv_def"
+        android:textSize="25dp"/>
 </LinearLayout>

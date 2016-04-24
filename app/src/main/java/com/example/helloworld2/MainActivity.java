@@ -47,64 +47,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		GraphView graph = (GraphView) findViewById(R.id.graph);
-		LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[] {
-		          new DataPoint(10, 50),
-		          new DataPoint(11, 20),
-		          new DataPoint(12, 45),
-		          new DataPoint(13, 55),
-		          new DataPoint(14, 10),
-		          new DataPoint(15, 25),
-		          new DataPoint(16, 15),
-		          new DataPoint(17, 30),
-		          new DataPoint(18, 5)
-		});
-		graph.addSeries(series);
-		LineGraphSeries<DataPoint> series2 = new LineGraphSeries<DataPoint>( );
-		series2.appendData(new DataPoint(10,50), true, 50);
-		series2.appendData(new DataPoint(11,65), true, 50);
-		series2.appendData(new DataPoint(12,55), true, 50);
-		series2.appendData(new DataPoint(13,75), true, 50);
-		series2.appendData(new DataPoint(14,55), true, 50);
-		series2.appendData(new DataPoint(15,90), true, 50);
-		series2.appendData(new DataPoint(16,75), true, 50);
-		series2.appendData(new DataPoint(17,85), true, 50);
-		series2.appendData(new DataPoint(18,100), true, 50);
-		graph.addSeries(series2);
-		series2.setColor(Color.GREEN);
-		graph.getViewport().setScalable(true);
-		graph.getViewport().setScrollable(true);
-		graph.getViewport().setXAxisBoundsManual(true);
-		graph.getViewport().setMinX(10.0);
-		graph.getViewport().setMaxX(14.0);
-		graph.getViewport().setYAxisBoundsManual(true);
-		graph.getViewport().setMinY(0.0);
-		graph.getViewport().setMaxY(100);
-//		graph.getViewport().setBackgroundColor(Color.WHITE);
-		graph.setTitle("Pushkar vs Zaki");
-		graph.getGridLabelRenderer().setHorizontalAxisTitle("Time");
-		graph.getGridLabelRenderer().setVerticalAxisTitle("Productivity");
-		graph.getGridLabelRenderer().setHorizontalLabelsColor(Color.RED);
-		graph.getLegendRenderer().setVisible(true);
-		graph.getLegendRenderer().setAlign(LegendAlign.TOP);
-		series.setTitle("IP");
-		series2.setTitle("Zaki");
-		series.setOnDataPointTapListener(new OnDataPointTapListener() {
 
-            @Override
-            public void onTap(Series arg0, DataPointInterface arg1) {
-                Toast.makeText(getApplicationContext(), "Time: " + arg1.getX() + " Hrs Prod: " + arg1.getY() + "%", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-		series2.setOnDataPointTapListener(new OnDataPointTapListener() {
-			
-			@Override
-			public void onTap(Series arg0, DataPointInterface arg1) {
-				Toast.makeText(getApplicationContext(), "Time: "+arg1.getX()+" Hrs Prod: "+arg1.getY()+"%", Toast.LENGTH_SHORT).show();
-				
-			}
-		});
 		bRealTime = (Button) findViewById(R.id.bRealTime);
 		bRealTime.setOnClickListener(new OnClickListener() {
 			
