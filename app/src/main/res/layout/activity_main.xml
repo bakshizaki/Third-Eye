@@ -14,18 +14,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:weightSum="3"
         >
 
         <Button android:id="@+id/bRealTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Graphical View"/>
+            android:text="Graphical View"
+            android:layout_weight="1"
+            android:textSize="30sp"/>
 
 
         <Button android:id="@+id/bGaugeTest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Gauge View"/>
+            android:text="Gauge View"
+            android:layout_weight="1"
+            android:textSize="30sp"/>
         <!--
         <Button android:id="@+id/bMakeCSV"
                 android:layout_width="wrap_content"
@@ -39,7 +44,9 @@
         <Button android:id="@+id/bLoadCSV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Load CSV"/>
+            android:text="Load CSV"
+            android:layout_weight="1"
+            android:textSize="30sp"/>
     </LinearLayout>
     <!--
     <com.jjoe64.graphview.GraphView
