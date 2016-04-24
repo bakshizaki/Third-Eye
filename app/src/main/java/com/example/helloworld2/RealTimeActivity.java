@@ -209,10 +209,15 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
 
         for(int i=0;i<parameterList.size();i++) {
             if(selectedParameter.contains(parameterList.get(i).getName())) {
-                if()
-                parameterList.get(i).setVisible(true);
-                parameterList.get(i).series.appendData(new DataPoint(btData.getTime()-firstTime,btData.getParameter(i+1)),true,120);
-                graph.addSeries(parameterList.get(i).series);
+                if(parameterList.get(i).series == null || btData == null) {
+                    selectedParameter.remove(parameterList.get(i).getName());
+                    Toast.makeText(getApplicationContext(),"No data to display in "+parameterList.get(i).getName(),Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    parameterList.get(i).setVisible(true);
+                    parameterList.get(i).series.appendData(new DataPoint(btData.getTime() - firstTime, btData.getParameter(i + 1)), true, 120);
+                    graph.addSeries(parameterList.get(i).series);
+                }
             } else {
                 parameterList.get(i).setVisible(false);
                 graph.removeSeries(parameterList.get(i).series);
@@ -409,7 +414,11 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
                                                     for(int i=0;i<parameterList.size();i++) {
 
                                                         if(parameterList.get(i).isVisible())
-                                                            parameterList.get(i).series.appendData(new DataPoint(btData.getTime()-firstTime,btData.getParameter(i+1)),true,120);
+                                                            try {
+                                                            parameterList.get(i).series.appendData(new DataPoint(btData.getTime()-firstTime,btData.getParameter(i+1)),true,120); }
+                                                            catch (Exception e) {
+
+                                                            }
                                                     }
 
                                                     if (isRecording) {
@@ -708,7 +717,14 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
     @Override
     public void onDialogFinish(int selected) {
         selected_item = selected;
-
+        if(paired_addresses.size() == 0)
+            return;
+        if (btSocket != null) {
+            if (btSocket.isConnected()) {
+                Toast.makeText(getApplicationContext(),"Already Connected",Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
         address = paired_addresses.get(selected_item).toString();
 
         if (mConnectedThread != null) {
@@ -724,7 +740,11 @@ public class RealTimeActivity extends Activity implements OnClickListener, GetRe
                 parameterList.get(i).setVisible(true);
                 parameterList.get(i).series = new LineGraphSeries<DataPoint>();
                 parameterList.get(i).series.setColor(parameterList.get(i).getColour());
-                graph.addSeries(parameterList.get(i).series);
+                try {
+                    graph.addSeries(parameterList.get(i).series);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
